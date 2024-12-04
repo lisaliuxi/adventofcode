@@ -2,67 +2,57 @@ with open('day 4.txt', 'r') as file:
     data = [list(line.strip()) for line in file]
 
 # task 1
+def is_valid_ind(data, ind, x_ind, deltas):
+    for delta in deltas:
+        new_row, new_col = ind + delta[0], x_ind + delta[1]
+        if not (0 <= new_row < len(data) and 0 <= new_col < len(data[0])):
+            return False
+    return True
+
+
+def check_sequence(data, ind, x_ind, deltas):
+    if not is_valid_ind(data, ind, x_ind, deltas):
+        return False
+    return all(
+        data[ind + delta[0]][x_ind + delta[1]] == char
+        for delta, char in zip(deltas, "MAS")
+    )
+
+
+directions = {
+    "horizontal_forward": [(0, 1), (0, 2), (0, 3)],
+    "horizontal_backward": [(0, -1), (0, -2), (0, -3)],
+    "vertical_down": [(1, 0), (2, 0), (3, 0)],
+    "vertical_up": [(-1, 0), (-2, 0), (-3, 0)],
+    "diag_down_right": [(1, 1), (2, 2), (3, 3)],
+    "diag_up_right": [(-1, 1), (-2, 2), (-3, 3)],
+    "diag_down_left": [(1, -1), (2, -2), (3, -3)],
+    "diag_up_left": [(-1, -1), (-2, -2), (-3, -3)],
+}
 
 n = 0
 for ind, row in enumerate(data):
     X_index_list = [i for i, x in enumerate(row) if x == 'X']
-    
     for x_ind in X_index_list:
-        # 1. forward - 
-        if x_ind <= len(row)-4: #horizontal
-            if data[ind][x_ind+1] == 'M':
-                if data[ind][x_ind+2] == 'A':
-                    if data[ind][x_ind+3] == 'S':
-                        n += 1
-            if ind <= len(data)-4: #right bottom diag
-                if data[ind+1][x_ind+1] == 'M':
-                    if data[ind+2][x_ind+2] == 'A':
-                        if data[ind+3][x_ind+3] == 'S':
-                            n += 1
-            if ind >= 3: #right up diag
-                if data[ind-1][x_ind+1] == 'M':
-                    if data[ind-2][x_ind+2] == 'A':
-                        if data[ind-3][x_ind+3] == 'S':
-                            n += 1
-        # 2. backwards 
-        if x_ind >= 3: #horizontal
-            if data[ind][x_ind-1] == 'M':
-                if data[ind][x_ind-2] == 'A':
-                    if data[ind][x_ind-3] == 'S':
-                        n += 1 
-            if ind <= len(data)-4: #left bottom diag
-                if data[ind+1][x_ind-1] == 'M':
-                    if data[ind+2][x_ind-2] == 'A':
-                        if data[ind+3][x_ind-3] == 'S':
-                            n += 1           
-            if ind >= 3: #left up diag
-                if data[ind-1][x_ind-1] == 'M':
-                    if data[ind-2][x_ind-2] == 'A':
-                        if data[ind-3][x_ind-3] == 'S':
-                            n += 1
-        
-        # 2. vertical
-        if ind <= len(data)-3:
-            if data[ind+1][x_ind] == 'M':
-                if data[ind+2][x_ind] == 'A':
-                    if data[ind+3][x_ind] == 'S':
-                        n += 1
-        if ind >=3:
-            if data[ind-1][x_ind] == 'M':
-                if data[ind-2][x_ind] == 'A':
-                    if data[ind-3][x_ind] == 'S':
-                        n += 1
+        for direction, deltas in directions.items():
+            if check_sequence(data, ind, x_ind, deltas):
+                n += 1
+
+print(n)
+
 # task 2
 n = 0
 
-for ind, row in enumerate(data): 
-    
-    if ind not in [0, len(data)-1]:  # A cant be in first / last row
+for ind, row in enumerate(data):
+
+    if ind not in [0, len(data) - 1]:  # A cant be in first / last row
         A_index_list = [i for i, x in enumerate(row) if x == 'A']
-        
+
         for a_ind in A_index_list:
-            if a_ind not in [0, len(row)-1]: 
-                list_of_MS_1 = [data[ind-1][a_ind-1], data[ind+1][a_ind+1]]
-                list_of_MS_2 = [data[ind-1][a_ind+1], data[ind+1][a_ind-1]]
+            if a_ind not in [0, len(row) - 1]:
+                list_of_MS_1 = [data[ind - 1][a_ind - 1], data[ind + 1][a_ind + 1]]
+                list_of_MS_2 = [data[ind - 1][a_ind + 1], data[ind + 1][a_ind - 1]]
                 if sorted(list_of_MS_1) == ['M', 'S'] and sorted(list_of_MS_2) == ['M', 'S']:
-                    n+=1
+                    n += 1
+
+print(n)
